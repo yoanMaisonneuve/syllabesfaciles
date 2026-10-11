@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Confidentialité — Syllabes Faciles</title>
-<meta name="description" content="Syllabes Faciles ne recueille aucune donnée sur votre enfant : aucun compte, aucune publicité, aucun traceur. On compte les visites du site, sans cookie et sans rien qui vous identifie.">
+<meta name="description" content="Syllabes Faciles ne recueille aucune donnée sur votre enfant : aucun compte, aucune publicité, aucun traceur publicitaire. On compte les visites du site, sans cookie et sans rien qui vous identifie.">
 <!-- A3 (08.10.2026) — la page de confidentialité demandée par Apple (APP-STORE.md, étape 3).
      Elle vit DANS le build (frontend/public/) : publier-racine.sh remplace toute la racine de
      syllabesfaciles.ca à chaque publication, une page posée à la main dans le dépôt du site
@@ -20,16 +20,18 @@
   .essentiel p { margin: 6px 0; }
   a { color: #C0479B; }
   footer { margin-top: 40px; color: #7A6A86; font-size: 15px; }
+  button { font: inherit; font-weight: 600; color: #fff; background: #C0479B; border: 0; border-radius: 14px; padding: 12px 18px; min-height: 48px; cursor: pointer; }
+  #etat-compteur { display: block; margin-top: 8px; color: #7A6A86; }
 </style>
 </head>
 <body>
 <main>
   <h1>Confidentialité</h1>
-  <p class="date">Syllabes Faciles · en vigueur le 10 octobre 2026 (le 8 octobre 2026 avant le compteur de visites)</p>
+  <p class="date">Syllabes Faciles · en vigueur le 11 octobre 2026 (le 10 octobre 2026 avant le compteur complété, le 8 octobre 2026 avant le compteur de visites)</p>
 
   <div class="essentiel">
     <p><strong>Syllabes Faciles ne recueille aucune donnée sur votre enfant.</strong></p>
-    <p>Aucun compte. Aucune publicité. Aucun achat. Aucun traceur. On compte les visites, sans cookie et sans rien qui vous identifie.</p>
+    <p>Aucun compte. Aucune publicité. Aucun achat. Aucun traceur publicitaire. On compte les visites, sans cookie et sans rien qui vous identifie.</p>
     <p>Son prénom, ses réponses, ses résultats, ses mots restent sur votre appareil, et ne sont envoyés nulle part.</p>
   </div>
 
@@ -45,12 +47,39 @@
   <h2>Ce que le site compte</h2>
   <p>Sur le site syllabesfaciles.ca, et seulement là, l'app compte ses visites pour savoir ce qui sert : les
   écrans ouverts (l'accueil, Jouer, les livres…), les jeux commencés (lequel, jamais le niveau ni le résultat),
-  les histoires lues (laquelle, et si on en a lu le début, la moitié ou la fin), le mot de campagne d'une adresse
-  partagée (le ?src= de l'adresse, retiré aussitôt), et si l'appareil revient une autre semaine (l'appareil ne
-  garde pour cela que la date de sa première semaine).</p>
+  les histoires lues (laquelle, et si on en a lu le début, la moitié ou la fin), l'arrivée d'un nouvel appareil avec
+  le mot de campagne de l'adresse qui l'a amené (le ?src= d'une adresse partagée, retiré aussitôt de l'adresse ; le mot
+  direct s'il n'y en a pas), et si cet appareil revient au moins sept jours après sa première visite.</p>
+  <p>Pour cela, l'appareil garde trois choses, et seulement sur lui : le jour de sa première visite, le mot de campagne
+  de cette première visite, et le fait que son retour a déjà été compté.</p>
   <p>Rien d'autre : aucun cookie, aucun identifiant, ni prénom, ni mot tapé, ni réponse, ni score, ni la taille de
   l'écran. Les comptes vont à <a href="https://www.goatcounter.com/help/privacy">GoatCounter</a>, un outil libre
   qui ne garde pas l'adresse IP. Si votre navigateur demande de ne pas suivre (Do Not Track, GPC), rien n'est compté.</p>
+
+  <h2>Ne pas compter cet appareil</h2>
+  <p>Ce bouton dit à l'app de ne plus rien compter depuis cet appareil, dans ce navigateur, pour tous les enfants qui
+  y jouent. Il ne change rien d'autre : les jeux, la progression et les livres restent tels quels. Il se défait du même
+  bouton.</p>
+  <p><button id="ne-pas-compter" type="button">Ne pas compter cet appareil</button>
+  <span id="etat-compteur" role="status"></span></p>
+  <!-- V1c (11.10.2026 ; le CMO, COMPTEUR-DE-VISITES.md §8 point 5) : le bouton pose `compteur_off` dans le stockage
+       local de CE site, la même clé que l'app lit avant tout compte (components/compteur.ts, les silences). La page et
+       l'app ont la même adresse, donc le même stockage. Rien n'est envoyé. Banc : banc-reseau R4. -->
+  <script>
+  (function () {
+    var b = document.getElementById('ne-pas-compter'), e = document.getElementById('etat-compteur');
+    function off() { try { return localStorage.getItem('compteur_off') === '1'; } catch (_) { return false; } }
+    function dire() {
+      b.textContent = off() ? 'Compter de nouveau cet appareil' : 'Ne pas compter cet appareil';
+      e.textContent = off() ? 'Cet appareil n\u2019est pas compté.' : '';
+    }
+    b.addEventListener('click', function () {
+      try { if (off()) localStorage.removeItem('compteur_off'); else localStorage.setItem('compteur_off', '1'); } catch (_) {}
+      dire();
+    });
+    dire();
+  })();
+  </script>
 
   <h2>Le micro</h2>
   <p>Le micro ne sert qu'à une chose : enregistrer votre voix quand vous créez vous-même un mot de la
