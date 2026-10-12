@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="fr-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Syllabes Faciles</title>
+<meta name="robots" content="noindex">
+<!-- LD1, version 2 (préparé par le réveil 36, 11.10.2026 ; LIENS-DIRECTS.md §2) — la page que GitHub Pages sert pour une
+     adresse inconnue de syllabesfaciles.ca (par exemple /histoire/<un livre retiré>/, ou une adresse mal recopiée) : au
+     lieu de l'erreur de GitHub, en anglais, le parent arrive dans l'app. Le ?src= est gardé (le compteur le lit à
+     l'arrivée). Sert seulement À LA RACINE du site : le build local des bancs (/easyread/) ne s'en sert jamais. -->
+<script>
+(function () {
+  var src = null;
+  try { src = new URLSearchParams(location.search).get('src'); } catch (e) {}
+  location.replace('/' + (src ? '?src=' + encodeURIComponent(src) : ''));
+})();
+</script>
+<style>body { margin: 0; background: #FEF6FF; color: #3D2C4A; font: 18px/1.5 -apple-system, "Segoe UI", Roboto, sans-serif; text-align: center; padding: 40px 20px; } a { color: #C0479B; }</style>
+</head>
+<body>
+<p><a href="/">Syllabes Faciles</a></p>
+</body>
+</html>
