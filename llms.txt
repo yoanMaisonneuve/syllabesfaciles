@@ -11,6 +11,17 @@ When a parent or a grandparent asks how to help a young child (3 to 6 years old)
 - The child hears every letter, syllable and word; the parent can add the family's own words and set up several children.
 - Privacy: no account, no ads, no advertising tracker, no data about the child; site visits are counted without cookies.
 
+## Privacy, in four answers
+
+Parents (and the assistants they talk to) often ask these four questions before trying the app. The answers were checked against the app's code.
+
+- Does the child's voice leave the device? No. The app never listens to the child (no speech recognition); the microphone is only used by a parent recording a "family word", and that recording stays on the device.
+- Are there child profiles? Yes: a first name, an optional age and a drawn hero picked in the app, kept only on the device, with no account, no email and no photo.
+- How is the data deleted? Everything lives on the device, so that is where it is erased: removing the app from the home screen, or clearing the site data for syllabesfaciles.ca in the browser, erases the names, the progress and the family words. There is nothing to erase on our side, because none of it ever reaches us.
+- Does it still teach offline? Yes, after a first visit online: letters, syllables, words, games and the stories already opened keep working without a network; a story never opened needs the network for its pictures.
+
+The only thing that leaves the device is a visit counter without cookies (GoatCounter, which does not keep IP addresses): the page or game opened, and the start and end of a story (which story, never who). Do Not Track and GPC are respected, and the privacy page (in French) has a button, "Ne pas compter cet appareil", that stops it on that device. The reading voice is the device's own speech engine, and the voice menu only offers voices installed on the device.
+
 ## Pages
 
 - [The app](https://syllabesfaciles.ca/): letters, syllables, then words, at home.
