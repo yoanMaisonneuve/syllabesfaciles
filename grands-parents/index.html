@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="fr-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lire avec vos petits-enfants — Syllabes Faciles</title>
+<meta name="description" content="Une app pour lire avec vos petits-enfants, syllabe par syllabe, avec une voix qui lit à voix haute. Essayez-la avec eux, ou envoyez-la à leurs parents. Sans compte, sans publicité.">
+<link rel="canonical" href="https://syllabesfaciles.ca/grands-parents/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Syllabes Faciles">
+<meta property="og:locale" content="fr_CA">
+<meta property="og:url" content="https://syllabesfaciles.ca/grands-parents/">
+<meta property="og:title" content="Lire avec vos petits-enfants">
+<meta property="og:description" content="Une app pour lire avec eux, syllabe par syllabe, avec une voix qui lit à voix haute. Sans compte, sans publicité.">
+<meta property="og:image" content="https://syllabesfaciles.ca/og/papi-pico.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="La couverture de « Pico et le secret de Papi Hibou » : un petit hibou et son grand-papa, sous la lune">
+<meta name="twitter:card" content="summary_large_image">
+<!-- GP1 (26.10.2026 ; Yoan, 06:43 : « Tu as raison pour la page, on peut la faire pour elle. Comme c'est elle qui partage. »)
+     La page des grands-parents : la pub des grands-mamans y mène, pas à l'app. Pourquoi :
+     communication/cmo/syllabes/16-angle-grand-maman-2026-10-26.md (dépôt openClaude).
+     - Une page simple, sans l'app : elle s'ouvre dans la fenêtre de Facebook sans la porte « Ouvrir dans Chrome » (F71).
+     - « L'essayer avec eux » : sur Android dans la fenêtre d'une app, le lien ouvre Chrome directement (le même lien
+       intent:// que lienChrome() de components/NavigateurIntegre.tsx, et le même mot « -chrome ») ; ailleurs, l'app.
+     - Le message aux parents porte son lien, ?src=gm-partage : le compteur dira si les grands-mamans relaient.
+     - Les boutons cités sont ceux de l'écran, vérifiés sur le site en ligne le 26.10 (Paramètres, Mes listes de mots,
+       Ajouter un mot, Mot, Syllabes, Enregistrer, Stop, Créer) : si un bouton change de nom, cette page change avec lui.
+     - L'exemple est « mamie » (ma-mie) : un mot à trait d'union comme « grand-maman » est refusé par « Ajouter un mot »
+       (les syllabes recollées doivent redonner le mot, et le trait d'union sépare les syllabes).
+     - Le compteur est une copie fidèle de components/compteur.ts (V1a à V1c) : même adresse, mêmes silences (hors du
+       domaine, Ne pas suivre, GPC, compteur_off, navigateur piloté), mêmes clés du stockage local, même liste blanche.
+       En plus de l'arrivée et du retour, il compte la page : /ecran/grands-parents. Rien d'autre (pas les boutons).
+     - Aucun chiffre, aucune promesse de résultats, « gratuit » jamais en titre, aucun émoji, pas de rose. -->
+<style>
+  @font-face { font-family: 'Fredoka'; src: url('fredoka-600.ttf') format('truetype'); font-weight: 600; font-display: swap; }
+  :root {
+    --fond: #F3F8FC; --carte: #FFFFFF; --encre: #1E2940; --doux: #4A566C; --trait: #D3E0EC;
+    --ciel-haut: #B9E0FF; --ciel-bas: #E6F4FF; --vert: #5DB548; --vert-fonce: #3F9136;
+    --orange: #C8410B; --orange-fonce: #A83508; --bleu: #1D4ED8; --bleu-fonce: #1A3FB0;
+    --jaune: #FFD93D; --clair: #EEF5FB;
+    --titre: 'Fredoka', 'Trebuchet MS', 'Segoe UI', sans-serif;
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body { margin: 0; background: var(--fond); color: var(--encre);
+    font: 20px/1.6 -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+  h1, h2 { font-family: var(--titre); font-weight: 600; margin: 0; line-height: 1.2; text-wrap: balance; }
+  h1 { font-size: clamp(34px, 9vw, 46px); }
+  h2 { font-size: 27px; }
+  p { margin: 0; }
+  a { color: var(--bleu); }
+  .col { max-width: 640px; margin: 0 auto; padding-inline: 18px; }
+  .k { background: var(--jaune); border-radius: 10px; padding: 0 8px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+
+  /* Le ciel de l'accueil de l'app, ses nuages et ses collines */
+  .ciel { position: relative; overflow: hidden; padding-block: 28px 86px;
+    background:
+      radial-gradient(70px 28px at 84% 10%, #fff 98%, transparent 100%),
+      radial-gradient(48px 22px at 76% 13%, #fff 98%, transparent 100%),
+      linear-gradient(var(--ciel-haut), var(--ciel-bas)); }
+  .ciel::before, .ciel::after { content: ''; position: absolute; bottom: -70px; height: 140px; border-radius: 50%; }
+  .ciel::before { left: -10%; width: 75%; background: var(--vert); }
+  .ciel::after { right: -12%; width: 70%; background: var(--vert-fonce); bottom: -84px; }
+  .ciel .col { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 16px; }
+  .marque { font-family: var(--titre); font-weight: 600; font-size: 19px; color: var(--bleu-fonce); letter-spacing: .02em; }
+  .chapo { font-size: 21px; }
+
+  .boutons { display: flex; flex-direction: column; gap: 12px; margin-top: 6px; }
+  .bouton { display: flex; align-items: center; justify-content: center; text-align: center; min-height: 60px;
+    padding: 12px 20px; border-radius: 16px; border: 0; font-family: var(--titre); font-weight: 600; font-size: 22px;
+    line-height: 1.25; text-decoration: none; cursor: pointer; width: 100%; }
+  .bouton.orange { background: var(--orange); color: #fff; box-shadow: 0 4px 0 var(--orange-fonce); }
+  .bouton.bleu { background: var(--bleu); color: #fff; box-shadow: 0 4px 0 var(--bleu-fonce); }
+  .bouton.clair { background: var(--carte); color: var(--encre); border: 2px solid var(--trait); font-size: 20px; min-height: 56px; }
+  .bouton:focus-visible { outline: 4px solid var(--jaune); outline-offset: 3px; }
+  .sous { font-size: 17px; color: var(--doux); text-align: center; }
+
+  main { display: flex; flex-direction: column; gap: 34px; padding-block: 30px 40px; }
+  section { display: flex; flex-direction: column; gap: 14px; }
+  .carte { background: var(--carte); border: 1px solid var(--trait); border-radius: 20px; padding: 22px 18px; }
+  textarea { width: 100%; min-height: 150px; padding: 14px; border: 2px solid var(--trait); border-radius: 14px;
+    font: inherit; font-size: 20px; line-height: 1.5; color: var(--encre); background: var(--clair); resize: vertical; }
+  textarea:focus { outline: 3px solid var(--bleu); outline-offset: 1px; }
+  .lien { font-size: 17px; color: var(--doux); overflow-wrap: anywhere; }
+  .envois { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .envois .large { grid-column: 1 / -1; }
+  .etat { min-height: 1.6em; font-size: 18px; color: var(--vert-fonce); font-weight: 600; }
+
+  .couverture { display: block; width: min(250px, 70%); height: auto; margin: 0 auto; border-radius: 16px;
+    box-shadow: 0 10px 26px rgba(30, 41, 64, .22); }
+  ol.etapes { margin: 0; padding: 0; list-style: none; counter-reset: etape; display: flex; flex-direction: column; gap: 12px; }
+  ol.etapes li { counter-increment: etape; position: relative; padding: 14px 14px 14px 62px; background: var(--carte);
+    border: 1px solid var(--trait); border-radius: 16px; }
+  ol.etapes li::before { content: counter(etape); position: absolute; left: 14px; top: 13px; width: 34px; height: 34px;
+    border-radius: 50%; background: var(--bleu); color: #fff; font-family: var(--titre); font-weight: 600; font-size: 20px;
+    display: flex; align-items: center; justify-content: center; }
+  .note { font-size: 18px; color: var(--doux); }
+
+  ul.puces { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 10px; }
+  ul.puces li { font-family: var(--titre); font-weight: 600; font-size: 19px; background: var(--clair);
+    border: 2px solid var(--trait); border-radius: 999px; padding: 6px 16px; }
+
+  .question { background: var(--ciel-bas); border-radius: 20px; padding: 24px 18px; }
+  .question .grande { font-family: var(--titre); font-weight: 600; font-size: 26px; line-height: 1.3; }
+  footer { padding-block: 10px 40px; font-size: 18px; color: var(--doux); text-align: center; }
+  footer a { color: var(--doux); }
+</style>
+</head>
+<body>
+
+<header class="ciel">
+  <div class="col">
+    <p class="marque">Syllabes Faciles</p>
+    <h1>Lire avec vos <span class="k">petits-enfants</span></h1>
+    <p class="chapo">Une app pour apprendre à lire, syllabe par syllabe. Une voix lit à voix haute, et chaque mot s'allume
+      pendant qu'elle le lit. Essayez-la avec eux, ou envoyez-la à leurs parents.</p>
+    <div class="boutons">
+      <a class="bouton orange" href="#message">L'envoyer à leurs parents</a>
+      <a class="bouton bleu" id="essayer" href="/">L'essayer avec eux</a>
+    </div>
+  </div>
+</header>
+
+<main class="col">
+
+  <section id="message" class="carte" aria-labelledby="titre-message">
+    <h2 id="titre-message">Le message, prêt à envoyer</h2>
+    <p>Il demande leur avis, sans rien imposer. Vous pouvez le changer avant de l'envoyer.</p>
+    <label for="texte" class="note">Votre message</label>
+    <textarea id="texte" rows="5">J'ai trouvé une app pour lire avec les petits, sans pub et sans compte. Tu veux regarder ? Dis-moi ce que t'en penses.</textarea>
+    <p class="lien">Le lien de l'app s'ajoute à la fin : syllabesfaciles.ca</p>
+    <div class="envois">
+      <button type="button" class="bouton orange large" id="partager" hidden>Envoyer le message</button>
+      <a class="bouton clair" id="texto" href="sms:">Par texto</a>
+      <a class="bouton clair" id="courriel" href="mailto:">Par courriel</a>
+      <button type="button" class="bouton clair large" id="copier">Copier le message</button>
+    </div>
+    <p class="etat" id="etat" role="status" aria-live="polite"></p>
+    <p class="note">Vos amis ont des petits-enfants, eux aussi ?
+      <a id="facebook" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fsyllabesfaciles.ca%2Fgrands-parents%2F%3Fsrc%3Dgm-facebook" target="_blank" rel="noopener">Partagez cette page sur Facebook</a>.</p>
+  </section>
+
+  <section aria-labelledby="titre-voix">
+    <img class="couverture" src="papi-hibou.jpg" width="412" height="556"
+      alt="La couverture de « Pico et le secret de Papi Hibou » : un petit hibou et son grand-papa hibou, sur une branche, sous la lune">
+    <h2 id="titre-voix">Votre voix, dans leurs jeux</h2>
+    <p>Ajoutez le nom que vos petits-enfants vous donnent, par exemple « mamie » ou « papi », et enregistrez-le avec votre
+      voix. Quand le mot revient dans leurs jeux, c'est votre voix qu'ils entendent. L'enregistrement reste sur
+      l'appareil.</p>
+    <p class="note">Sur votre tablette, pour leurs visites ; ou sur celle de la maison, pendant que vous y êtes.</p>
+    <ol class="etapes">
+      <li>Ouvrez l'app. En haut à droite, touchez le petit rond.</li>
+      <li>Touchez « Paramètres ». Plus bas, touchez « Mes listes de mots ».</li>
+      <li>Touchez « Ajouter un mot ». Écrivez « mamie » dans « Mot », puis « ma-mie » dans « Syllabes ».</li>
+      <li>Touchez « Enregistrer », dites « mamie », puis touchez « Stop ». Si le téléphone le demande, permettez le micro.</li>
+      <li>Touchez « Créer ».</li>
+    </ol>
+  </section>
+
+  <section class="carte" aria-labelledby="titre-savoir">
+    <h2 id="titre-savoir">Ce qu'il faut savoir</h2>
+    <ul class="puces">
+      <li>Sans compte</li>
+      <li>Sans mot de passe</li>
+      <li>Sans publicité</li>
+      <li>Sans frais</li>
+    </ul>
+    <p>Pour les enfants de 3 à 6 ans, en français, en anglais et en espagnol. Des jeux de lettres et de syllabes, et des
+      histoires illustrées sur les petits moments de leur vie : attendre, partager, dire au revoir.</p>
+    <p>Créée par Yoan, un papa du Québec, pour sa fille.</p>
+  </section>
+
+  <section class="question" aria-labelledby="titre-question">
+    <h2 id="titre-question">Une question pour vous</h2>
+    <p class="grande">Quel livre lisiez-vous à vos enfants, le soir ?</p>
+    <p>Vos souvenirs nous aident à choisir les prochaines histoires. Écrivez-nous : <a
+      href="mailto:contact@syllabesfaciles.ca">contact@syllabesfaciles.ca</a></p>
+  </section>
+
+</main>
+
+<footer class="col">
+  <a href="/aide/">Aide</a> · <a href="/confidentialite/">Confidentialité</a> · <a href="/">Syllabes Faciles</a>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+  var MOT = /^[a-z0-9-]{1,32}$/;
+  var morceau = function (x) {
+    return String(x).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+      .replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 32);
+  };
+
+  // Le mot de campagne (?src=), lu avant d'être retiré de l'adresse : il ne se recompte pas et ne se partage pas.
+  var motDepart = null;
+  try {
+    var u = new URL(location.href);
+    var src = u.searchParams.get('src');
+    if (src !== null) {
+      var net = morceau(src);
+      motDepart = MOT.test(net) ? net : null;
+      u.searchParams.delete('src');
+      history.replaceState(history.state, '', u.pathname + u.search + u.hash);
+    }
+  } catch (e) {}
+
+  // Le compteur : copie fidèle de components/compteur.ts (voir la note en tête de page).
+  var ADRESSE = 'https://yoanmaisonneuve.goatcounter.com/count';
+  var PERMIS = /^\/(ecran|jeu|histoire|arrivee|retour)\/[a-z0-9-]+(\/(debut|milieu|fin))?$/;
+  function adresse() {
+    var hote = location.hostname;
+    if (hote === '127.0.0.1') {
+      var essai = window.__compteurEssai;
+      return typeof essai === 'string' && /^http:\/\/127\.0\.0\.1:\d+\/count$/.test(essai) ? essai : null;
+    }
+    if (hote !== 'syllabesfaciles.ca' && hote !== 'www.syllabesfaciles.ca') return null;
+    try {
+      if (navigator.webdriver === true || /HeadlessChrome/.test(String(navigator.userAgent || ''))) return null;
+    } catch (e) { return null; }
+    return ADRESSE;
+  }
+  function silence() {
+    try {
+      if (navigator.doNotTrack === '1' || navigator.doNotTrack === 'yes' || window.doNotTrack === '1') return true;
+      if (navigator.globalPrivacyControl === true) return true;
+      if (localStorage.getItem('compteur_off') === '1') return true;
+    } catch (e) { return true; }
+    return false;
+  }
+  function actif() { var a = adresse(); return a && !silence() ? a : null; }
+  function compter(p, evenement) {
+    try {
+      var base = actif();
+      if (!base || !PERMIS.test(p)) return;
+      var url = base + '?p=' + encodeURIComponent(p) + (evenement ? '&e=true' : '')
+        + '&rnd=' + Math.random().toString(36).slice(2, 8);
+      fetch(url, { mode: 'no-cors', credentials: 'omit', keepalive: true, referrerPolicy: 'no-referrer', cache: 'no-store' })
+        .catch(function () {});
+    } catch (e) {}
+  }
+  function jourDe(d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function joursEntre(a, b) {
+    var A = a.split('-').map(Number), B = b.split('-').map(Number);
+    return Math.round((Date.UTC(B[0], B[1] - 1, B[2]) - Date.UTC(A[0], A[1] - 1, A[2])) / 86400000);
+  }
+  try {
+    if (actif()) {
+      var ls = localStorage, auj = jourDe(new Date());
+      var premier = ls.getItem('compteur_premier_jour');
+      if (!premier && ls.getItem('compteur_premiere_semaine')) { premier = auj; ls.setItem('compteur_premier_jour', premier); }
+      ls.removeItem('compteur_premiere_semaine');
+      if (!premier || !/^\d{4}-\d{2}-\d{2}$/.test(premier)) {
+        var mot = motDepart || 'direct';
+        ls.setItem('compteur_premier_jour', auj);
+        ls.setItem('compteur_premier_mot', mot);
+        compter('/arrivee/' + mot, true);
+      } else if (joursEntre(premier, auj) >= 7 && ls.getItem('compteur_retour_dit') !== '1') {
+        ls.setItem('compteur_retour_dit', '1');
+        var m = ls.getItem('compteur_premier_mot');
+        compter('/retour/semaine-2-' + (m && MOT.test(m) ? m : 'inconnu'), true);
+      }
+    }
+  } catch (e) {}
+  compter('/ecran/grands-parents', false);
+
+  // « L'essayer avec eux » : sur Android, dans la fenêtre d'une app (Facebook, Messenger, Instagram, TikTok), la voix
+  // qui lit n'existe pas ; le lien ouvre donc Chrome directement, comme lienChrome() de l'app.
+  var ua = navigator.userAgent || '';
+  var android = /Android/i.test(ua);
+  var integre = /Instagram/i.test(ua)
+    || /MessengerForiOS|Orca-Android|FB_IAB\/MESSENGER|FBAN\/Messenger/i.test(ua)
+    || /FBAN|FBAV|FB_IAB|FBIOS|FB4A|\[FB/i.test(ua)
+    || /BytedanceWebview|musical_ly|TikTok|trill_/i.test(ua)
+    || (android && /; wv\)/.test(ua));
+  try {
+    var cible = new URL('/', location.href);
+    var essayer = document.getElementById('essayer');
+    if (android && integre) {
+      cible.searchParams.set('src', (motDepart ? motDepart.slice(0, 25) : 'direct') + '-chrome');
+      essayer.href = 'intent://' + cible.host + cible.pathname + cible.search
+        + '#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=' + encodeURIComponent(cible.toString()) + ';end';
+    } else {
+      if (motDepart) cible.searchParams.set('src', motDepart);
+      essayer.href = cible.pathname + cible.search;
+    }
+  } catch (e) {}
+
+  // Le message aux parents : le texte de la grand-maman, puis le lien suivi.
+  var LIEN = 'https://syllabesfaciles.ca/?src=gm-partage';
+  var texte = document.getElementById('texte');
+  var etat = document.getElementById('etat');
+  var ios = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  function message() { return texte.value.trim() + '\n\n' + LIEN; }
+  function majLiens() {
+    var m = message();
+    document.getElementById('texto').href = 'sms:' + (ios ? '&' : '?') + 'body=' + encodeURIComponent(m);
+    document.getElementById('courriel').href = 'mailto:?subject=' + encodeURIComponent('Une app pour lire avec les petits')
+      + '&body=' + encodeURIComponent(m);
+  }
+  texte.addEventListener('input', majLiens);
+  majLiens();
+
+  var partager = document.getElementById('partager');
+  if (navigator.share) {
+    partager.hidden = false;
+    partager.addEventListener('click', function () { navigator.share({ text: message() }).catch(function () {}); });
+  }
+  document.getElementById('copier').addEventListener('click', function () {
+    var fini = function () { etat.textContent = 'Le message est copié. Collez-le dans un texto ou dans Messenger.'; };
+    // Sans presse-papiers moderne : une copie cachée du message entier (le texte et le lien), sélectionnée puis copiée.
+    var repli = function () {
+      var t = document.createElement('textarea');
+      t.value = message();
+      t.setAttribute('readonly', '');
+      t.style.position = 'fixed'; t.style.top = '0'; t.style.left = '-9999px';
+      document.body.appendChild(t);
+      t.select();
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(t);
+      etat.textContent = ok ? 'Le message est copié. Collez-le dans un texto ou dans Messenger.'
+        : 'La copie n’a pas fonctionné. Essayez « Par texto ».';
+    };
+    try { navigator.clipboard.writeText(message()).then(fini, repli); } catch (e) { repli(); }
+  });
+})();
+</script>
+</body>
+</html>
