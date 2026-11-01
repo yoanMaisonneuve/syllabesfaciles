@@ -120,7 +120,7 @@
       pendant qu'elle le lit. Essayez-la avec eux, ou envoyez-la à leurs parents.</p>
     <div class="boutons">
       <a class="bouton orange" href="#message">L'envoyer à leurs parents</a>
-      <a class="bouton bleu" id="essayer" href="/">L'essayer avec eux</a>
+      <a class="bouton bleu" id="essayer" href="/?langue=fr">L'essayer avec eux</a>
     </div>
   </div>
 </header>
@@ -281,6 +281,8 @@
     || (android && /; wv\)/.test(ua));
   try {
     var cible = new URL('/', location.href);
+    // F85 (01.11.2026) : la page est en français, l'app aussi — même sur un téléphone réglé en anglais.
+    cible.searchParams.set('langue', 'fr');
     var essayer = document.getElementById('essayer');
     if (android && integre) {
       cible.searchParams.set('src', (motDepart ? motDepart.slice(0, 25) : 'direct') + '-chrome');
@@ -293,7 +295,7 @@
   } catch (e) {}
 
   // Le message aux parents : le texte de la grand-maman, puis le lien suivi.
-  var LIEN = 'https://syllabesfaciles.ca/?src=gm-partage';
+  var LIEN = 'https://syllabesfaciles.ca/?src=gm-partage&langue=fr';
   var texte = document.getElementById('texte');
   var etat = document.getElementById('etat');
   var ios = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
