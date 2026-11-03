@@ -19,7 +19,7 @@
 // A CHAQUE PUBLICATION : changer VERSION. Sinon les tablettes qui ont deja l'app gardent
 // l'ancien cache. C'est la panne P27 de l'app de plans, apprise a la dure le 20 septembre.
 
-const VERSION = 'syllabes-2026-11-02-0654';
+const VERSION = 'syllabes-2026-11-02-2209';
 const COQUILLE = VERSION + '-coquille';
 
 // Relatif au sw.js lui-meme : marche a /easyread/ en ligne comme a / en local, sans rien coder en dur.
@@ -61,6 +61,11 @@ self.addEventListener('fetch', (e) => {
   if (url.origin !== self.location.origin) return;          // jamais les autres domaines
   if (url.pathname.startsWith(RACINE + 'api/')) return;      // le backend inexistant : on laisse echouer vite
   if (!url.pathname.startsWith(RACINE)) return;              // hors de notre portee (ex : /plan/)
+  // F106 (02.11.2026) : le fichier CHIFFRE d'un livre prive ne passe pas par ici. La page (components/LivrePrive.tsx) le
+  // demande au reseau d'abord et garde sa copie dans son propre cache, qu'une publication ne vide pas : le « cache d'abord »
+  // d'ici servirait pour toujours un livre corrige ou retire du site. Le contenu dechiffre ne passe jamais par le reseau,
+  // donc jamais par ici : les images sont des data: dans la page.
+  if (url.pathname.startsWith(RACINE + 'perso/')) return;
 
   // La page : reseau d'abord.
   if (req.mode === 'navigate') {

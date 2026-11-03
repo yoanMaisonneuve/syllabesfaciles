@@ -12,6 +12,19 @@
     }
   } catch (e) {}
 })();
+</script><script>
+(function () {
+  // F106 (02.11.2026) : le lien d'un livre prive a une requete ET un fragment : ?perso=<nom>#<cle>. Le routeur d'Expo recolle
+  // l'adresse de depart en pathname + hash + search (ExpoRoot.js d'expo-router 6) et la recrit /#<cle>?perso=<nom>, ou
+  // plus rien ne veut rien dire (mesure au banc, le 02.11). On lui cache la cle le temps qu'il monte : elle passe dans la
+  // page, et components/LivrePrive.tsx la remet dans l'adresse une fois le routeur monte (recharger, Ouvrir dans le navigateur).
+  try {
+    if (location.hash && /[?&]perso=/.test(location.search)) {
+      window.__clePerso = location.hash.slice(1);
+      history.replaceState(history.state, '', location.pathname + location.search);
+    }
+  } catch (e) {}
+})();
 </script><style id="expo-reset">#root,body,html{height:100%}body{overflow:hidden}#root{display:flex}</style><style>
               body > div:first-child { position: fixed !important; top: 0; left: 0; right: 0; bottom: 0; }
               /* Une tablette dans les mains d'une enfant de quatre ans. Deux tapes rapides sur
@@ -122,6 +135,7 @@ input::-webkit-search-cancel-button,input::-webkit-search-decoration,input::-web
 .r-60ke3l{border-bottom-color:rgba(0,128,0,1.00);border-left-color:rgba(0,128,0,1.00);border-right-color:rgba(0,128,0,1.00);border-top-color:rgba(0,128,0,1.00);}
 .r-6ncur5{border-bottom-left-radius:18px;border-bottom-right-radius:18px;border-top-left-radius:18px;border-top-right-radius:18px;}
 .r-6t2glc{border-bottom-left-radius:40px;border-bottom-right-radius:40px;border-top-left-radius:40px;border-top-right-radius:40px;}
+.r-6zbxs8{border-bottom-color:rgba(26,115,232,1.00);border-left-color:rgba(26,115,232,1.00);border-right-color:rgba(26,115,232,1.00);border-top-color:rgba(26,115,232,1.00);}
 .r-9x6qib{border-bottom-color:rgba(204,214,221,1.00);border-left-color:rgba(204,214,221,1.00);border-right-color:rgba(204,214,221,1.00);border-top-color:rgba(204,214,221,1.00);}
 .r-a1yn9n{border-bottom-left-radius:28px;border-bottom-right-radius:28px;border-top-left-radius:28px;border-top-right-radius:28px;}
 .r-brgb1{border-bottom-color:rgba(0,0,0,0.15);border-left-color:rgba(0,0,0,0.15);border-right-color:rgba(0,0,0,0.15);border-top-color:rgba(0,0,0,0.15);}
@@ -156,6 +170,7 @@ input::-webkit-search-cancel-button,input::-webkit-search-decoration,input::-web
 .r-ub6tad{padding:1px;}
 .r-uc0mu4{border-bottom-color:rgba(255,255,255,0.55);border-left-color:rgba(255,255,255,0.55);border-right-color:rgba(255,255,255,0.55);border-top-color:rgba(255,255,255,0.55);}
 .r-v3zo9w{border-bottom-left-radius:52px;border-bottom-right-radius:52px;border-top-left-radius:52px;border-top-right-radius:52px;}
+.r-vxn6zb{border-bottom-color:rgba(59,47,143,1.00);border-left-color:rgba(59,47,143,1.00);border-right-color:rgba(59,47,143,1.00);border-top-color:rgba(59,47,143,1.00);}
 .r-wg31gx{border-bottom-color:rgba(49,53,56,1.00);border-left-color:rgba(49,53,56,1.00);border-right-color:rgba(49,53,56,1.00);border-top-color:rgba(49,53,56,1.00);}
 .r-xoduu5{display:inline-flex;}
 .r-xyw6el{padding:12px;}
@@ -350,6 +365,7 @@ input::-webkit-search-cancel-button,input::-webkit-search-decoration,input::-web
 .r-19qsa7v{gap:13px;}
 .r-19tjxh9{width:26px;}
 .r-19wmn03{width:20px;}
+.r-19yznuf{min-height:52px;}
 .r-19z077z{touch-action:none;}
 .r-1a8msfu{height:38px;}
 .r-1aa9ipq{color:rgba(255,255,255,0.88);}
@@ -479,6 +495,7 @@ input::-webkit-search-cancel-button,input::-webkit-search-decoration,input::-web
 .r-1muvv40{animation-iteration-count:infinite;}
 .r-1mwlp6a{height:56px;}
 .r-1mxxalw{color:rgba(34,38,46,1.00);}
+.r-1n665dy{z-index:390;}
 .r-1ncqg4v{background-color:rgba(214,59,112,1.00);}
 .r-1nh45zr{text-shadow:0px 2px 4px rgba(0,0,0,0.30);}
 .r-1niwhzg{background-color:rgba(0,0,0,0.00);}
@@ -489,6 +506,7 @@ input::-webkit-search-cancel-button,input::-webkit-search-decoration,input::-web
 .r-1nr9gu9{color:rgba(255,255,255,0.95);}
 .r-1nxhmzv{margin-bottom:28px;}
 .r-1ny4l3l{outline-style:none;}
+.r-1o5i94f{background-color:rgba(59,47,143,1.00);}
 .r-1ocf4r9{scroll-snap-type:y mandatory;}
 .r-1odb0v4{line-height:74px;}
 .r-1ois7e2{color:rgba(55,65,81,1.00);}
@@ -766,6 +784,7 @@ input::-webkit-search-cancel-button,input::-webkit-search-decoration,input::-web
 .r-h4nt6v{box-shadow:0px 10px 20px rgba(0,0,0,0.40);}
 .r-h7zev3{top:14px;}
 .r-hbpseb{line-height:22px;}
+.r-hjklzo{line-height:19px;}
 .r-hr69ez{background-color:rgba(0,0,0,0.15);}
 .r-hv712p{row-gap:8px;}
 .r-hxflta{padding-right:env(safe-area-inset-right);}
@@ -810,6 +829,7 @@ input::-webkit-search-cancel-button,input::-webkit-search-decoration,input::-web
 .r-me5xia{height:104px;}
 .r-mfh4gg{scroll-snap-type:x mandatory;}
 .r-mhe3cw{z-index:10;}
+.r-mnb498{color:rgba(26,79,184,1.00);}
 .r-mro3nb{background-color:rgba(21,23,24,1.00);}
 .r-mw4fk6{background-color:rgba(255,255,255,0.35);}
 .r-mwqdrt{background-color:rgba(233,223,204,1.00);}
@@ -867,6 +887,7 @@ input::-webkit-search-cancel-button,input::-webkit-search-decoration,input::-web
 .r-s8bhmr{min-width:56px;}
 .r-sfbmgh{z-index:9999;}
 .r-sga3zk{height:64px;}
+.r-sjnvrz{z-index:4000;}
 .r-so7y2g{line-height:64px;}
 .r-suhe1l{font-size:46px;}
 .r-t4w6jl{min-width:72px;}
@@ -907,6 +928,7 @@ input::-webkit-search-cancel-button,input::-webkit-search-decoration,input::-web
 .r-vvn4in{background-position:center;}
 .r-vw2c0b{font-weight:bold;}
 .r-w1hb72{color:rgba(45,42,90,1.00);}
+.r-waer2z{line-height:25px;}
 .r-wc24c3{z-index:20;}
 .r-wf0mho{width:106px;}
 .r-wfqgy4{transition-duration:100ms;}
@@ -923,6 +945,7 @@ input::-webkit-search-cancel-button,input::-webkit-search-decoration,input::-web
 .r-xd6kpl{padding-bottom:8px;}
 .r-xfp68n{background-color:rgba(60,25,80,0.18);}
 .r-xmpm6q{font-size:90px;}
+.r-xnfwke{line-height:38px;}
 .r-xx3c9p{animation-name:r-imtty0;}
 .r-xznnki{border-left-width:26px;}
 .r-y7v2we{background-color:rgba(32,36,37,1.00);}
@@ -973,5 +996,5 @@ input::-webkit-search-cancel-button,input::-webkit-search-decoration,input::-web
     });
   } catch (e) {}
 })();
-</script><script src="/_expo/static/js/web/entry-7ce7aa3253d9ab03eb05508076f34047.js" defer></script>
+</script><script src="/_expo/static/js/web/entry-4de1a1676b57aba13c7dc73dc9857ca4.js" defer></script>
 </body></html>
