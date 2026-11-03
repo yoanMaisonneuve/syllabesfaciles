@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Paco, la voix de la tour</title>
+<style>
+  :root { --ciel: #d6eeff; --encre: #1e2a4a; --allume: #ffd93d; --papier: #fffbf0; --vert: #1f7a45; --rouge: #b3261e; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ciel); color: var(--encre); font: 17px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 34rem; margin-inline: auto; padding: 14px 14px 40px; display: grid; gap: 14px; }
+  .livre { background: var(--papier); border-radius: 22px; padding: 12px; display: grid; gap: 14px; box-shadow: 0 4px 14px rgba(30, 42, 74, .16); }
+  .livre img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 14px; display: block; }
+  .phrase { margin: 0; padding: 0 4px 6px; font-size: clamp(1.35rem, 6.2vw, 1.8rem); font-weight: 700; line-height: 1.5; text-align: center; min-height: 4.5em; }
+  .mot { padding: .02em .16em; border-radius: .3em; }
+  .mot.lu { background: var(--allume); }
+  button { font: inherit; font-weight: 800; font-size: 1.3rem; min-height: 64px; width: 100%; border: 0; border-radius: 999px; background: #1a73e8; color: #fff; cursor: pointer; }
+  button:focus-visible { outline: 3px solid var(--encre); outline-offset: 2px; }
+  .bilan { background: #fff; border-radius: 14px; padding: 12px 14px; font-size: .95rem; display: grid; gap: 4px; }
+  .bilan div { display: flex; justify-content: space-between; gap: 12px; }
+  .ok { color: var(--vert); } .non { color: var(--rouge); }
+</style>
+</head>
+<body>
+<main>
+  <section class="livre">
+    <img id="image" src="p01.webp" alt="Une page de Paco le lama et la licorne">
+    <p class="phrase" id="phrase"></p>
+    <audio id="voix" preload="auto" src="p01.mp3"></audio>
+    <button id="ecouter" type="button">Écouter tout le livre</button>
+  </section>
+  <section class="bilan">
+    <div><span>La fenêtre</span><b id="d-fenetre"></b></div>
+    <div><span>Moteur de voix du téléphone</span><b id="d-moteur"></b></div>
+    <div><span>Pages jouées</span><b id="d-pages">0 sur 16</b></div>
+  </section>
+</main>
+<script>
+const PAGES = [{"page": "p01", "mots": ["Sur", "la", "montagne", "vit", "Paco,", "un", "lama", "tout", "doux", "avec", "de", "grandes", "oreilles."], "debuts": [0.05, 0.334, 0.443, 0.866, 1.022, 1.772, 1.852, 2.151, 2.322, 2.493, 2.777, 2.886, 3.214]}, {"page": "p02", "mots": ["Un", "jour,", "Paco", "voit", "passer", "une", "licorne", "qui", "brille", "de", "toutes", "les", "couleurs.", "Oh!", "Qu’elle", "est", "belle!"], "debuts": [0.05, 0.195, 0.856, 1.154, 1.342, 1.654, 1.748, 2.215, 2.353, 2.621, 2.747, 3.015, 3.14, 4.554, 5.722, 5.958, 6.035]}, {"page": "p03", "mots": ["Moi", "aussi,", "je", "veux", "être", "une", "licorne,", "se", "dit", "Paco."], "debuts": [0.05, 0.328, 0.895, 1.039, 1.213, 1.388, 1.484, 2.203, 2.406, 2.547]}, {"page": "p04", "mots": ["Il", "met", "un", "cornet", "de", "crème", "glacée", "sur", "sa", "tête.", "Ta-da!", "Une", "corne!"], "debuts": [0.05, 0.241, 0.43, 0.51, 0.891, 1.001, 1.267, 1.662, 1.838, 2.011, 3.327, 4.679, 4.914]}, {"page": "p05", "mots": ["Mais", "le", "soleil", "fait", "fondre", "la", "crème", "glacée.", "Elle", "coule", "sur", "son", "nez.", "Plic,", "ploc!"], "debuts": [0.05, 0.219, 0.342, 0.747, 0.9, 1.257, 1.366, 1.631, 3.0, 3.217, 3.481, 3.731, 3.92, 5.053, 5.785]}, {"page": "p06", "mots": ["Paco", "se", "roule", "dans", "les", "fleurs", "pour", "avoir", "de", "belles", "couleurs.", "Ta-da!"], "debuts": [0.05, 0.397, 0.552, 0.818, 0.958, 1.052, 1.505, 1.707, 2.032, 2.156, 2.372, 3.804]}, {"page": "p07", "mots": ["Les", "fleurs", "lui", "chatouillent", "le", "nez.", "Atchoum!", "Atchoum!", "Les", "pétales", "s’envolent", "partout."], "debuts": [0.05, 0.26, 0.685, 0.841, 1.274, 1.397, 2.509, 4.031, 5.562, 5.777, 6.199, 6.633]}, {"page": "p08", "mots": ["Paco", "s’assoit", "sur", "un", "rocher.", "Je", "ne", "serai", "jamais", "une", "licorne,", "soupire-t-il."], "debuts": [0.05, 0.382, 0.832, 1.066, 1.145, 2.465, 2.651, 2.759, 3.025, 3.349, 3.441, 4.156]}, {"page": "p09", "mots": ["Le", "soir", "tombe", "et", "le", "vent", "souffle.", "Tout", "à", "coup,", "la", "licorne", "arrive.", "Elle", "tremble", "de", "froid."], "debuts": [0.05, 0.239, 0.582, 0.895, 0.957, 1.082, 1.284, 2.654, 2.81, 2.962, 3.551, 3.676, 4.109, 5.506, 5.724, 6.113, 6.254]}, {"page": "p10", "mots": ["Que", "tu", "es", "chanceux,", "dit", "la", "licorne.", "Ta", "laine", "est", "si", "douce", "et", "si", "chaude!"], "debuts": [0.05, 0.204, 0.347, 0.44, 1.106, 1.277, 1.398, 2.861, 3.017, 3.234, 3.312, 3.513, 3.795, 3.872, 4.042]}, {"page": "p11", "mots": ["Paco", "ouvre", "grand", "les", "yeux.", "Chanceux,", "moi?", "Il", "n’avait", "jamais", "pensé", "à", "sa", "laine."], "debuts": [0.05, 0.488, 0.739, 1.064, 1.203, 2.399, 3.128, 4.348, 4.503, 4.781, 5.099, 5.463, 5.541, 5.711]}, {"page": "p12", "mots": ["Paco", "a", "une", "idée.", "Avec", "la", "laine", "qui", "tombe", "quand", "il", "se", "brosse,", "il", "tricote", "un", "foulard."], "debuts": [0.05, 0.451, 0.56, 0.7, 1.906, 2.201, 2.326, 2.56, 2.714, 2.976, 3.146, 3.362, 3.486, 4.121, 4.244, 4.664, 4.743]}, {"page": "p13", "mots": ["La", "licorne", "met", "le", "foulard.", "Ah,", "comme", "c’est", "chaud!", "Elle", "brille", "encore", "plus", "fort."], "debuts": [0.05, 0.25, 0.728, 0.866, 0.977, 2.486, 2.985, 3.187, 3.376, 4.588, 4.792, 5.088, 5.432, 5.587]}, {"page": "p14", "mots": ["Pour", "dire", "merci,", "elle", "souffle", "des", "étoiles", "sur", "le", "dos", "de", "Paco.", "Ta-da!"], "debuts": [0.05, 0.265, 0.487, 1.131, 1.317, 1.68, 1.808, 2.323, 2.513, 2.624, 2.81, 2.889, 4.125]}, {"page": "p15", "mots": ["Paco", "se", "regarde", "dans", "le", "lac.", "Un", "lama,", "un", "vrai!", "Il", "aime", "sa", "laine", "et", "ses", "grandes", "oreilles."], "debuts": [0.05, 0.399, 0.571, 1.06, 1.234, 1.313, 2.615, 2.727, 3.371, 3.464, 4.7, 4.887, 5.028, 5.216, 5.467, 5.546, 5.703, 6.034]}, {"page": "p16", "mots": ["Depuis", "ce", "jour,", "le", "lama", "et", "la", "licorne", "sont", "les", "meilleurs", "amis", "de", "la", "montagne."], "debuts": [0.05, 0.441, 0.597, 1.24, 1.4, 1.713, 1.777, 1.903, 2.358, 2.545, 2.638, 3.024, 3.318, 3.412, 3.535]}];
+const voix = document.getElementById('voix'), image = document.getElementById('image'), phrase = document.getElementById('phrase');
+const bouton = document.getElementById('ecouter');
+let courante = 0, spans = [], jouees = 0;
+function ecrire(id, texte, classe) { const e = document.getElementById(id); e.textContent = texte; e.className = classe || ''; }
+function montrer(i) {
+  const p = PAGES[i];
+  image.src = p.page + '.webp';
+  phrase.textContent = '';
+  spans = p.mots.map((m) => { const s = document.createElement('span'); s.className = 'mot'; s.textContent = m; phrase.append(s, ' '); return s; });
+}
+function suivre() {
+  const p = PAGES[courante];
+  if (!voix.paused && !voix.ended) {
+    let actif = -1;
+    for (let k = 0; k < p.debuts.length; k++) if (voix.currentTime >= p.debuts[k]) actif = k;
+    spans.forEach((s, k) => s.classList.toggle('lu', k === actif));
+  }
+  requestAnimationFrame(suivre);
+}
+async function jouer(i) {
+  courante = i;
+  montrer(i);
+  if (voix.getAttribute('src') !== PAGES[i].page + '.mp3') { voix.src = PAGES[i].page + '.mp3'; voix.load(); }
+  try {
+    await voix.play();
+    bouton.hidden = true;
+  } catch (e) {
+    ecrire('d-pages', 'refusé page ' + (i + 1) + ' : ' + e.name, 'non');
+    bouton.hidden = false;
+    bouton.textContent = 'Continuer';
+    bouton.onclick = () => jouer(i);
+  }
+}
+voix.addEventListener('ended', () => {
+  jouees = Math.max(jouees, courante + 1);
+  ecrire('d-pages', jouees + ' sur ' + PAGES.length, 'ok');
+  spans.forEach((s) => s.classList.remove('lu'));
+  if (courante + 1 < PAGES.length) { setTimeout(() => jouer(courante + 1), 450); return; }
+  bouton.hidden = false;
+  bouton.textContent = 'Réécouter';
+  bouton.onclick = () => jouer(0);
+});
+voix.addEventListener('error', () => ecrire('d-pages', 'erreur du fichier, page ' + (courante + 1), 'non'));
+const ua = navigator.userAgent;
+const fenetre = /Instagram/i.test(ua) ? 'Instagram' : /Orca-Android|FB_IAB\/MESSENGER|FBAN\/Messenger|MessengerForiOS/i.test(ua) ? 'Messenger'
+  : /FBAN|FBAV|FB_IAB|FBIOS|FB4A|\[FB/i.test(ua) ? 'Facebook' : /; wv\)/.test(ua) ? 'Fenêtre d\u2019une app' : 'Un vrai navigateur';
+ecrire('d-fenetre', fenetre);
+ecrire('d-moteur', 'speechSynthesis' in window ? 'présent' : 'absent', 'speechSynthesis' in window ? 'ok' : 'non');
+montrer(0);
+bouton.onclick = () => jouer(0);
+requestAnimationFrame(suivre);
+</script>
+</body>
+</html>
