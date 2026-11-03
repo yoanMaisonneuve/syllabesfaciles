@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Comparer les voix</title>
+<style>
+  :root { --ciel: #d6eeff; --encre: #1e2a4a; --papier: #fffbf0; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ciel); color: var(--encre); font: 17px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 34rem; margin-inline: auto; padding: 14px 14px 40px; display: grid; gap: 16px; }
+  h1 { font-size: 1.4rem; margin: 4px 0 0; }
+  .livre { background: var(--papier); border-radius: 22px; padding: 12px; display: grid; gap: 10px; box-shadow: 0 4px 14px rgba(30, 42, 74, .16); }
+  .livre img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 14px; display: block; }
+  .phrase { margin: 0; font-weight: 700; font-size: 1.15rem; text-align: center; }
+  .voix { display: grid; grid-template-columns: 4.2rem 1fr; align-items: center; gap: 8px; }
+  audio { width: 100%; min-width: 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Quelle voix lit le mieux à un enfant ?</h1>
+  <p>Écoute les trois voix sur chaque page, puis dis-moi la lettre que tu gardes.</p>
+  <section class="livre"><img src="p04.webp" alt="Une page de Paco" loading="lazy"><p class="phrase">Il met un cornet de crème glacée sur sa tête. Ta-da! Une corne!</p><div class="voix"><b>Voix A</b><audio controls preload="none" src="a-p04.mp3"></audio></div><div class="voix"><b>Voix B</b><audio controls preload="none" src="b-p04.mp3"></audio></div><div class="voix"><b>Voix C</b><audio controls preload="none" src="c-p04.mp3"></audio></div></section>
+  <section class="livre"><img src="p05.webp" alt="Une page de Paco" loading="lazy"><p class="phrase">Mais le soleil fait fondre la crème glacée. Elle coule sur son nez. Plic, ploc!</p><div class="voix"><b>Voix A</b><audio controls preload="none" src="a-p05.mp3"></audio></div><div class="voix"><b>Voix B</b><audio controls preload="none" src="b-p05.mp3"></audio></div><div class="voix"><b>Voix C</b><audio controls preload="none" src="c-p05.mp3"></audio></div></section>
+  <section class="livre"><img src="p06.webp" alt="Une page de Paco" loading="lazy"><p class="phrase">Paco se roule dans les fleurs pour avoir de belles couleurs. Ta-da!</p><div class="voix"><b>Voix A</b><audio controls preload="none" src="a-p06.mp3"></audio></div><div class="voix"><b>Voix B</b><audio controls preload="none" src="b-p06.mp3"></audio></div><div class="voix"><b>Voix C</b><audio controls preload="none" src="c-p06.mp3"></audio></div></section>
+</main>
+</body>
+</html>
