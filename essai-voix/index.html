@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Essai de la voix</title>
+<style>
+  :root { --ciel: #d6eeff; --encre: #1e2a4a; --allume: #ffd93d; --papier: #fffbf0; --vert: #1f7a45; --rouge: #b3261e; --trait: #e6dcc4; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ciel); color: var(--encre); font: 17px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 34rem; margin-inline: auto; padding: 14px 14px 40px; display: grid; gap: 14px; }
+  .livre { background: var(--papier); border-radius: 22px; padding: 12px; display: grid; gap: 14px; box-shadow: 0 4px 14px rgba(30, 42, 74, .16); }
+  .livre img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 14px; display: block; }
+  .phrase { margin: 0; padding: 0 4px 6px; font-size: clamp(1.45rem, 6.6vw, 1.9rem); font-weight: 700; line-height: 1.5; text-align: center; min-height: 4.5em; }
+  .mot { padding: .02em .16em; border-radius: .3em; }
+  .mot.lu { background: var(--allume); }
+  button { font: inherit; font-weight: 800; font-size: 1.3rem; min-height: 64px; width: 100%; border: 0; border-radius: 999px; background: #1a73e8; color: #fff; cursor: pointer; }
+  button:focus-visible { outline: 3px solid var(--encre); outline-offset: 2px; }
+  .bilan { background: #fff; border-radius: 14px; padding: 12px 14px; font-size: .95rem; display: grid; gap: 4px; }
+  .bilan h1 { font-size: 1rem; margin: 0 0 4px; }
+  .bilan div { display: flex; justify-content: space-between; gap: 12px; }
+  .bilan b { text-align: right; }
+  .ok { color: var(--vert); } .non { color: var(--rouge); }
+  .question { font-weight: 700; margin: 0; text-align: center; }
+</style>
+</head>
+<body>
+<main>
+  <section class="livre">
+    <img id="image" src="p04.webp" alt="Paco le lama, un cornet de crème glacée sur la tête">
+    <p class="phrase" id="phrase"></p>
+    <audio id="voix" preload="auto" src="p04.mp3"></audio>
+    <button id="ecouter" type="button">Écouter l'histoire</button>
+  </section>
+  <p class="question" id="question" hidden>As-tu entendu la voix, et les mots se sont-ils allumés ?</p>
+  <section class="bilan">
+    <h1>Ce que ce téléphone a fait</h1>
+    <div><span>La fenêtre</span><b id="d-fenetre"></b></div>
+    <div><span>Moteur de voix du téléphone</span><b id="d-moteur"></b></div>
+    <div><span>Voix en fichier, page 1</span><b id="d-p0">pas encore</b></div>
+    <div><span>Page 2, sans toucher</span><b id="d-p1">pas encore</b></div>
+    <div><span>Page 3, sans toucher</span><b id="d-p2">pas encore</b></div>
+  </section>
+</main>
+<script>
+const PAGES = [{"page": "p04", "mots": ["Il", "met", "un", "cornet", "de", "crème", "glacée", "sur", "sa", "tête.", "Ta-da!", "Une", "corne!"], "debuts": [0.1, 0.287, 0.475, 0.55, 0.925, 1.038, 1.312, 1.7, 1.887, 2.05, 3.375, 4.725, 4.963]}, {"page": "p05", "mots": ["Mais", "le", "soleil", "fait", "fondre", "la", "crème", "glacée.", "Elle", "coule", "sur", "son", "nez.", "Plic,", "ploc!"], "debuts": [0.1, 0.275, 0.388, 0.8, 0.95, 1.3, 1.413, 1.688, 3.05, 3.263, 3.525, 3.775, 3.975, 5.1, 5.838]}, {"page": "p06", "mots": ["Paco", "se", "roule", "dans", "les", "fleurs", "pour", "avoir", "de", "belles", "couleurs.", "Ta-da!"], "debuts": [0.1, 0.438, 0.6, 0.863, 1.0, 1.1, 1.55, 1.75, 2.075, 2.2, 2.425, 3.85]}];
+const voix = document.getElementById('voix'), image = document.getElementById('image'), phrase = document.getElementById('phrase');
+const bouton = document.getElementById('ecouter'), question = document.getElementById('question');
+let courante = 0, spans = [], image_demandee = null;
+
+function ecrire(id, texte, classe) { const e = document.getElementById(id); e.textContent = texte; e.className = classe || ''; }
+
+function montrer(i) {
+  const p = PAGES[i];
+  image.src = p.page + '.webp';
+  phrase.textContent = '';
+  spans = p.mots.map((m) => {
+    const s = document.createElement('span'); s.className = 'mot'; s.textContent = m;
+    phrase.append(s, ' ');
+    return s;
+  });
+}
+
+function suivre() {
+  const p = PAGES[courante];
+  if (!voix.paused && !voix.ended) {
+    let actif = -1;
+    for (let k = 0; k < p.debuts.length; k++) if (voix.currentTime >= p.debuts[k]) actif = k;
+    spans.forEach((s, k) => s.classList.toggle('lu', k === actif));
+  }
+  requestAnimationFrame(suivre);
+}
+
+// Le même élément audio, pour les trois pages : c'est lui qu'un toucher a débloqué. Une page qui ne part pas seule le dit.
+async function jouer(i) {
+  courante = i;
+  montrer(i);
+  if (voix.getAttribute('src') !== PAGES[i].page + '.mp3') { voix.src = PAGES[i].page + '.mp3'; voix.load(); }
+  try {
+    await voix.play();
+    ecrire('d-p' + i, 'joue', 'ok');
+    bouton.hidden = true;
+  } catch (e) {
+    ecrire('d-p' + i, 'refusé : ' + e.name, 'non');
+    bouton.hidden = false;
+    bouton.textContent = i === 0 ? "Écouter l'histoire" : 'Continuer';
+    bouton.onclick = () => jouer(i);
+  }
+}
+
+voix.addEventListener('ended', () => {
+  ecrire('d-p' + courante, 'jouée en entier', 'ok');
+  spans.forEach((s) => s.classList.remove('lu'));
+  if (courante + 1 < PAGES.length) { jouer(courante + 1); return; }
+  question.hidden = false;
+  bouton.hidden = false;
+  bouton.textContent = 'Réécouter';
+  bouton.onclick = () => { question.hidden = true; jouer(0); };
+});
+voix.addEventListener('error', () => { ecrire('d-p' + courante, 'erreur du fichier', 'non'); });
+
+const ua = navigator.userAgent;
+const fenetre = /Instagram/i.test(ua) ? 'Instagram' : /Orca-Android|FB_IAB\/MESSENGER|FBAN\/Messenger|MessengerForiOS/i.test(ua) ? 'Messenger'
+  : /FBAN|FBAV|FB_IAB|FBIOS|FB4A|\[FB/i.test(ua) ? 'Facebook' : /; wv\)/.test(ua) ? 'Fenêtre d\u2019une app' : 'Un vrai navigateur';
+ecrire('d-fenetre', fenetre + (/Android/i.test(ua) ? ', Android' : /iPhone|iPad/i.test(ua) ? ', iPhone' : ''));
+ecrire('d-moteur', 'speechSynthesis' in window ? 'présent' : 'absent', 'speechSynthesis' in window ? 'ok' : 'non');
+montrer(0);
+bouton.onclick = () => jouer(0);
+requestAnimationFrame(suivre);
+</script>
+</body>
+</html>
