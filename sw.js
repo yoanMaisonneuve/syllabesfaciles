@@ -19,7 +19,7 @@
 // A CHAQUE PUBLICATION : changer VERSION. Sinon les tablettes qui ont deja l'app gardent
 // l'ancien cache. C'est la panne P27 de l'app de plans, apprise a la dure le 20 septembre.
 
-const VERSION = 'syllabes-2026-11-02-2209';
+const VERSION = 'syllabes-2026-11-03-2002';
 const COQUILLE = VERSION + '-coquille';
 
 // Relatif au sw.js lui-meme : marche a /easyread/ en ligne comme a / en local, sans rien coder en dur.
@@ -53,6 +53,38 @@ self.addEventListener('activate', (e) => {
   );
 });
 
+// F113 (03.11.2026) — LA VOIX SE MET EN CACHE A L'ECOUTE, pour qu'un livre ecoute se relise hors ligne.
+// Un element audio demande ses fichiers par plages d'octets (Range: bytes=0-) : le serveur repond 206, et un cache refuse un 206.
+// Safari exige en plus une vraie reponse 206 a ses plages (bytes=0-1 d'abord) : sans elle, il ne joue pas. Donc :
+//   - le fichier ENTIER est demande au reseau (sans Range) et garde sous son chemin ;
+//   - la plage demandee est decoupee ici, dans le fichier entier. Toucher un mot (une tranche du fichier) marche donc aussi hors ligne.
+// Dans COQUILLE, comme le reste : une publication vide la voix avec le reste, et un fichier remplace ne reste pas au cache pour toujours.
+async function voixEnCache(req, url) {
+  const cache = await caches.open(COQUILLE);
+  let entier = await cache.match(url.pathname);
+  if (!entier) {
+    entier = await fetch(url.href, { credentials: 'same-origin' });
+    if (!entier.ok) return entier;
+    if (entier.status === 200) cache.put(url.pathname, entier.clone()).catch(() => {});
+  }
+  const plage = /^bytes=(\d+)-(\d*)$/.exec(req.headers.get('range') || '');
+  if (!plage) return entier;
+  const octets = await entier.arrayBuffer();
+  const total = octets.byteLength;
+  const debut = Number(plage[1]);
+  if (debut >= total) return new Response(null, { status: 416, headers: { 'Content-Range': `bytes */${total}` } });
+  const fin = plage[2] ? Math.min(Number(plage[2]), total - 1) : total - 1;
+  return new Response(octets.slice(debut, fin + 1), {
+    status: 206,
+    headers: {
+      'Content-Type': entier.headers.get('Content-Type') || 'audio/mpeg',
+      'Content-Range': `bytes ${debut}-${fin}/${total}`,
+      'Content-Length': String(fin - debut + 1),
+      'Accept-Ranges': 'bytes',
+    },
+  });
+}
+
 self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
@@ -66,6 +98,8 @@ self.addEventListener('fetch', (e) => {
   // d'ici servirait pour toujours un livre corrige ou retire du site. Le contenu dechiffre ne passe jamais par le reseau,
   // donc jamais par ici : les images sont des data: dans la page.
   if (url.pathname.startsWith(RACINE + 'perso/')) return;
+  // F113 (03.11.2026) : la voix en fichiers d'un livre (voix/<id>/<langue>/pNN.mp3 et reperes.json). Voir voixEnCache.
+  if (url.pathname.startsWith(RACINE + 'voix/')) { e.respondWith(voixEnCache(req, url)); return; }
 
   // La page : reseau d'abord.
   if (req.mode === 'navigate') {
